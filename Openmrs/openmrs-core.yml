@@ -1,0 +1,77 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openmrs
+  labels:
+    app: openmrs
+spec:
+  selector:
+    app: openmrs
+  ports:
+    - port: 8080
+      protocol: TCP
+  type: LoadBalancer
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: openmrs-mysql-volume
+  labels:
+    app: openmrs-mysql-volume 
+spec: 
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: gp2
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openmrs-core
+  labels:
+    app: openmrs
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: openmrs
+  template:
+    metadata:
+      labels:
+        app: openmrs
+    spec:
+      containers:
+        - name: openmrs-core
+          image: suryartifacts.jfrog.io/surya/openmrs-core:1.0.0
+          ports:
+            - containerPort: 8080
+                    
+        - name: mysql
+          image: mysql:8.0
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: devops
+            - name: MYSQL_DATABASE
+              value: database
+            - name: MYSQL_USER
+              value: devops
+            - name: MYSQL_PASSWORD
+              value: devops    
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: mysql-pvc
+              mountPath: /var/lib/mysql
+
+      imagePullSecrets:
+        - name: downloading
+
+      volumes:
+        - name: mysql-pvc
+          persistentVolumeClaim:
+            claimName: openmrs-mysql-volume 
