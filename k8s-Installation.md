@@ -89,5 +89,6 @@ sudo apt-mark hold kubelet kubeadm kubectl
 
         
 *********** Execute the below command ONLY IN MASTER ***********
- 
+ ```
  kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
+ ```
