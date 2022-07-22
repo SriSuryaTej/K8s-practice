@@ -12,7 +12,6 @@ sudo usermod -aG docker ubuntu
 ```
 sudo -i
 ```
-```
 # Run these commands as root
 ###Install GO###
 ```
